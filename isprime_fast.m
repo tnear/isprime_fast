@@ -50,7 +50,7 @@ function isp = isprime_fast(N)
         assert(maxValue < flintmax);
     end
 
-    if maxValue/numel(N) > 500 || maxValue > maxBytesAllowed
+    if maxValue > maxBytesAllowed || takeSquareRootPath(numel(N), maxValue)
         % get primes up to sqrt(maxValue of N)
         upperBound = cast(sqrt(double(maxValue)), class(N));
     else
@@ -66,7 +66,10 @@ function isp = isprime_fast(N)
         end
 
         % rem() is faster with integers
-        if maxValue <= 4294967295 % intmax("uint32")
+        if maxValue <= 2147483647 % 2^31 - 1
+            N = int32(N);
+            p = int32(p);
+        elseif maxValue <= 4294967295 % 2^32 - 1
             N = uint32(N);
             p = uint32(p);
         else
@@ -80,7 +83,7 @@ function isp = isprime_fast(N)
             isp(k) = Xk>1 && all(rem(Xk, p(p<Xk)));
         end
     else
-        % p contains ALL primes <= N, search using ismember
+        % p contains ALL primes <= N, binary search using ismember
         isp(idxToCheck) = ismember(N(idxToCheck), p);
     end
 end
@@ -98,14 +101,15 @@ function isp = isScalarPrime(N)
     % also convert N to integer so that mod() is faster
     if N <= 3
         isp = N == 2 || N == 3;
-    elseif N <= 4294967295 % intmax("uint32")
+    elseif N <= 4294967295 % 2^32 - 1
         isp = isSmallPrime(uint32(N), uint32(3));
     elseif N <= 549755813888 % 2^39
-        isp = isSmallPrime(uint64(N), uint64(3));
-    elseif N <= uint64(562949953421312) % intmax("uint64") / 32768
+        %isp = isSmallPrime(uint64(N), uint64(3));
+        isp = isMediumPrime(uint64(N));
+    elseif N <= uint64(562949953421312) % 2^49
         isp = isMediumPrime(uint64(N));
     else
-        % large primes
+        % large primes, > 2^49
         isp = MillerRabinPrime(N);
     end
 end
@@ -126,16 +130,16 @@ function isp = isSmallPrime(N, lowNumToStartChecking)
 end
 
 function isp = isMediumPrime(N)
-    if mod(N, 2) == 0 || mod(N, 3) == 0
+    if any(mod(N, uint64([2, 3, 5, 7])) == 0)
         isp = false;
     else
         % check up to sqrt(N)
         upperBound = floor(sqrt(double(N)));
 
-        % generate 6x +/- 1: [5 7 11 13 17 19 23 25 ...]
-        % all primes are of this form
-        alternate = cast([4, 2], class(N));
-        timesToRepeat = floor((upperBound + 1) / 6);
+        % [2 3 5 7]-wheel
+        alternate = uint64([10 2 4 2 4 6 2 6 4 2 4 6 6 2 6 4 2 6 4 6 8 ...
+            4 2 4 2 4 8 6 4 6 2 4 6 2 6 6 4 2 4 6 2 6 4 2 4 2 10 2]);
+        timesToRepeat = floor(upperBound / 210) + 1; % cycle repeats every 2*3*5*7 = 210
         seq = cumsum(repmat(alternate, [1, timesToRepeat])) + 1;
 
         % determine prime based on remainder
@@ -149,4 +153,9 @@ function maxBytesAllowed = getMaxBytesAllowed
     % all primes will error
     userview = memory;
     maxBytesAllowed = userview.MaxPossibleArrayBytes * 8; % 8-byte (64-bit) integers
+end
+
+function bool = takeSquareRootPath(numElements, maxValue)
+    %bool = 500 * numElements < maxValue; % old heuristic
+    bool = 807.6 * numElements - 125648578 < maxValue;
 end

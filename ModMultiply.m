@@ -21,7 +21,7 @@ function result = ModMultiply(a, b, m)
         end
     elseif a == 2
         % faster calculation when a=2 (common in LucasPrime)
-        result = mod(b - (m - b), m);
+        result = b - (m - b);
         return;
     end
 

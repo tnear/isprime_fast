@@ -19,16 +19,16 @@ function isp = MillerRabinPrime(n)
 
     % https://miller-rabin.appspot.com/
     % deterministic bases for Miller-Rabin up to 2^64
-    if n < 1373653
+    if n >= 3071837692357849
+        numsToTry = [2, 325, 9375, 28178, 450775, 9780504, 1795265022];
+    elseif n < 1373653
         numsToTry = [2, 3];
     elseif n < 4759123141
         numsToTry = [2, 7, 61];
     elseif n < 47636622961201
         numsToTry = [2, 2570940, 211991001, 3749873356];
-    elseif n < 3071837692357849
-        numsToTry = [2, 75088, 642735, 203659041, 3613982119];
     else
-        numsToTry = [2, 325, 9375, 28178, 450775, 9780504, 1795265022];
+        numsToTry = [2, 75088, 642735, 203659041, 3613982119];
     end
 
     for numToTry = uint64(numsToTry)

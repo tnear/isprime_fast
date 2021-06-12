@@ -5,6 +5,7 @@ function result = ModAdd(a, b, m)
     if c == uint64(18446744073709551615) % intmax("uint64")
         % avoid overflow of a + b
         %assert(m >= b);
+        %assert(a + b > m)
         result = a - (m - b);
     else
         result = mod(c, m);

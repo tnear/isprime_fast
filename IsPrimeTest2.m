@@ -15,6 +15,20 @@ classdef IsPrimeTest2 < matlab.unittest.TestCase
             testCase.assertEqual(isprime_fast(range), isprime(range));
         end
 
+        function mediumPrime(testCase)
+            % medium prime is between 2^39 and 2^49
+            max = 1000;
+            out = false(1, max);
+            N = randi([2^39, 2^49], [1, max]);
+            evenIdx = mod(N, 2) == 0;
+            N(evenIdx) = N(evenIdx) + 1;
+            for x = 1:numel(N)
+                out(x) = isprime_fast(N(x));
+            end
+            testCase.assertEqual(out, isprime(sym(N)), "Failed for: " + N);
+            % 15 seconds
+        end
+
         function Int64Array(testCase)
             % array near flintmax (9e15)
             upperRange = uint64(flintmax) + uint64(1:2:39);
@@ -59,7 +73,7 @@ classdef IsPrimeTest2 < matlab.unittest.TestCase
         function perfSparse(testCase)
             s = sparse(500, 500);
             s(end) = prevprime(flintmax);
-            expPerfGain = 2.9;
+            expPerfGain = 2.84;
             measureArrayPerf(testCase, s, expPerfGain, 2);
         end
 
@@ -87,7 +101,7 @@ classdef IsPrimeTest2 < matlab.unittest.TestCase
 
         function allButOneTinyNumber(testCase)
             range = [repelem(1, 10000000), uint64(4.7e18)];
-            expPerfGain = 38;
+            expPerfGain = 37.5;
             measureArrayPerf(testCase, range, expPerfGain);
             % 38 seconds
         end
@@ -110,7 +124,7 @@ classdef IsPrimeTest2 < matlab.unittest.TestCase
             for x = 2:len
                 range(x) = prevprime(range(x-1) - 1);
             end
-            expPerfGain = 19.4;
+            expPerfGain = 19.2;
             measureArrayPerf(testCase, range, expPerfGain);
             % len 25:  20x   (82 sec)
             % len 100: 15.5x (221 sec)
@@ -135,6 +149,16 @@ classdef IsPrimeTest2 < matlab.unittest.TestCase
             expPerfGainOverSym = .094; % sym wins
             measureSymPerf(testCase, range, expPerfGainOverSym);
             % 10 seconds
+        end
+
+        function ismemberPathNearThreshold(testCase)
+            % ismember path near threshold
+            range = randi([7e8, 7.5e8], 1, 1300000);
+            evenIdx = mod(range, 2) == 0;
+        	range(evenIdx) = range(evenIdx) + 1;
+            expPerfGain = 18;
+            measureArrayPerf(testCase, range, expPerfGain, 1);
+            % 100 seconds
         end
 
         function roughlyEven(~)
