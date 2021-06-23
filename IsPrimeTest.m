@@ -93,13 +93,13 @@ classdef IsPrimeTest < matlab.unittest.TestCase
             sNum = sym(num);
             t3 = timeit(@() isprime(sNum)) + timeit(@() isprime(sNum));
             t3 = t3/2;
-            expPerfGainOverSym = 330;
+            expPerfGainOverSym = 325;
             testCase.log(matlab.unittest.Verbosity.Terse, string("SymAct: " + t3/t2 + ", Exp: " + expPerfGainOverSym));
             testCase.verifyGreaterThan(t3/t2, expPerfGainOverSym);
         end
 
         function perfTinyPrime(testCase)
-            expPerfGain = 5.25;
+            expPerfGain = 5.22;
             measureSmallNumPerf(testCase, 211, expPerfGain, 50);
         end
 
@@ -120,13 +120,13 @@ classdef IsPrimeTest < matlab.unittest.TestCase
         end
 
         function perfTinyComposite(testCase)
-            expPerfGain = 5.3;
+            expPerfGain = 5.15;
             measureSmallNumPerf(testCase, 221, expPerfGain, 50);
         end
 
         function perfSmallComposite(testCase)
-            expPerfGain = 6.6;
-            measureSmallNumPerf(testCase, 132869, expPerfGain, 40);
+            expPerfGain = 6.56;
+            measureSmallNumPerf(testCase, 132869, expPerfGain, 50);
         end
 
         function perfSmallComposite2(testCase)
@@ -139,44 +139,96 @@ classdef IsPrimeTest < matlab.unittest.TestCase
             measureSmallNumPerf(testCase, 23^7, expPerfGain);
         end
 
+        function perfBits24(testCase)
+            % non-prime
+            % factor(12165779) == [53, 53, 61, 71]
+            num = 12165779;
+            expPerfGain = 6.22;
+            measureSmallNumPerf(testCase, num, expPerfGain, 70);
+
+            % semiprime
+            % factor(9296257) == [3037, 3061]
+            num = 9296257;
+            expPerfGain = 6.12;
+            measureSmallNumPerf(testCase, num, expPerfGain, 70);
+
+            % prime
+            num = 9213791;
+            expPerfGain = 6.12;
+            measureSmallNumPerf(testCase, num, expPerfGain, 75);
+        end
+
+        function perfBits28(testCase)
+            % non-prime
+            % factor(156512119) == [97, 109, 113, 131]
+            num = 156512119;
+            expPerfGain = 6.65;
+            measureSmallNumPerf(testCase, num, expPerfGain, 30);
+
+            % semiprime
+            % factor(182131009) == [13001, 14009]
+            num = 182131009;
+            expPerfGain = 7.55;
+            measureSmallNumPerf(testCase, num, expPerfGain, 30);
+
+            % prime
+            num = 178956937;
+            expPerfGain = 7.55;
+            measureSmallNumPerf(testCase, num, expPerfGain, 30);
+        end
+
         function perfScalarInt32Prime(testCase)
             % medium prime
             prime = 2^31-1;
-            expPerfGain = 5.7;
+            expPerfGain = 8.2;
             t2 = measureSmallNumPerf(testCase, prime, expPerfGain);
 
             % symbolic
             sNum = sym(prime);
             t3 = timeit(@() isprime(sNum)) + timeit(@() isprime(sNum));
             t3 = t3/2;
-            expPerfGainOverSym = 261;
+            expPerfGainOverSym = 374;
             testCase.log(matlab.unittest.Verbosity.Terse, string("SymAct: " + t3/t2 + ", Exp: " + expPerfGainOverSym));
             testCase.verifyGreaterThan(t3/t2, expPerfGainOverSym);
         end
 
-        function perfBits35(testCase)
-            prime = nextprime(4.7e10);
-            expPerfGain = 2.33;
-            measureSmallNumPerf(testCase, prime, expPerfGain);
+        function perfBits36(testCase)
+            % non-prime
+            % factor(37208267497) == [401, 431, 461, 467]
+            num = 37208267497;
+            expPerfGain = 4;
+            measureSmallNumPerf(testCase, num, expPerfGain);
+
+            % semiprime
+            % factor(46896109787) == [206783, 226789]
+            num = 46896109787;
+            expPerfGain = 3.85;
+            measureSmallNumPerf(testCase, num, expPerfGain);
+
+            % prime
+            num = nextprime(4.7e10);
+            expPerfGain = 3.8;
+            measureSmallNumPerf(testCase, num, expPerfGain);
         end
 
-        function perfCompositeBits35(testCase)
-            p = nextprime(4.7e10) + 2;
-            expPerfGain = 2.6;
-            measureSmallNumPerf(testCase, p, expPerfGain);
+        function perfSmallFactorBits36(testCase)
+            % factor(47000000019) == [3, 7, 21247, 105337]
+            num = 47000000019;
+            expPerfGain = 338; % 390;
+            measureSmallNumPerf(testCase, num, expPerfGain, 40);
         end
 
         function perfSemiprimeBits41(testCase)
             % medium semiprime which is factor of primes and greater than uint32 max
             num = 1524119*1524119;
-            expPerfGain = 2.67;
-            t2 = measureSmallNumPerf(testCase, num, expPerfGain, 20);
+            expPerfGain = 2.64;
+            t2 = measureSmallNumPerf(testCase, num, expPerfGain);
 
             % symbolic
             sNum = sym(num);
             t3 = timeit(@() isprime(sNum)) + timeit(@() isprime(sNum)) + timeit(@() isprime(sNum));
             t3 = t3/3;
-            expPerfGainOverSym = .8; % symbolic wins
+            expPerfGainOverSym = .79; % symbolic wins
             testCase.log(matlab.unittest.Verbosity.Terse, string("SymAct: " + t3/t2 + ", Exp: " + expPerfGainOverSym));
             testCase.verifyGreaterThan(t3/t2, expPerfGainOverSym);
         end
@@ -261,7 +313,7 @@ classdef IsPrimeTest < matlab.unittest.TestCase
             sNum = sym(prime);
             t3 = timeit(@() isprime(sNum)) + timeit(@() isprime(sNum));
             t3 = t3/2;
-            expPerfGainOverSym = .58;
+            expPerfGainOverSym = .57;
             testCase.log(matlab.unittest.Verbosity.Terse, string("SymAct: " + t3/t2 + ", Exp: " + expPerfGainOverSym));
             testCase.verifyGreaterThan(t3/t2, expPerfGainOverSym);
         end
@@ -288,7 +340,7 @@ classdef IsPrimeTest < matlab.unittest.TestCase
         function perfLargestPrimes(testCase)
             % largest uint64 prime
             prime = uint64(18446744073709551557);
-            expPerfGain = .136;
+            expPerfGain = .133;
             measureSymbolic(testCase, prime, expPerfGain);
 
             prime = uint64(18446744073709551533);
@@ -306,7 +358,7 @@ classdef IsPrimeTest < matlab.unittest.TestCase
             t2 = t2/2;
 
             testCase.assertEqual(isp1, isprime_fast(range));
-            expPerfGain = 28;
+            expPerfGain = 27.6;
             testCase.log(matlab.unittest.Verbosity.Terse, string("Act: " + t1/t2 + ", Exp: " + expPerfGain));
             testCase.verifyGreaterThan(t1/t2, expPerfGain);
 
@@ -333,27 +385,28 @@ classdef IsPrimeTest < matlab.unittest.TestCase
         end
 
         function perfArray1(testCase)
-            % sqrt path (volatile due to rand)
-            range = randi([7e6, 1e7], 1, 370);
+            % sqrt path
+            range = randi([7e6, 1e7], 1, 450);
+            range(mod(range, 2) == 0) = range(mod(range, 2) == 0) + 1; % make odd
             t1 = timeit(@() isprime(range)) + timeit(@() isprime(range));
             t1 = t1/2;
             t2 = timeit(@() isprime_fast(range)) + timeit(@() isprime_fast(range));
             t2 = t2/2;
 
-            expPerfGain = 17;
+            expPerfGain = 10.8;
             testCase.log(matlab.unittest.Verbosity.Terse, string("Act: " + t1/t2 + ", Exp: " + expPerfGain));
             testCase.verifyGreaterThan(t1/t2, expPerfGain);
 
             % symbolic
             sRange = sym(range);
-            numTrials = 6;
+            numTrials = 7;
             tic;
             for x = 1:numTrials
                 isprime(sRange);
             end
             t3 = toc;
             t3 = t3/numTrials;
-            expPerfGainOverSym = 515;
+            expPerfGainOverSym = 595;
             testCase.log(matlab.unittest.Verbosity.Terse, string("SymAct: " + t3/t2 + ", Exp: " + expPerfGainOverSym));
             testCase.verifyGreaterThan(t3/t2, expPerfGainOverSym);
         end
@@ -370,7 +423,7 @@ classdef IsPrimeTest < matlab.unittest.TestCase
             t2 = t2/4;
 
             testCase.assertEqual(isp1, isprime_fast(range));
-            expPerfGain = 29; % volatile due to randi
+            expPerfGain = 28.5; % volatile due to randi
             testCase.log(matlab.unittest.Verbosity.Terse, string("Act: " + t1/t2 + ", Exp: " + expPerfGain));
             testCase.verifyGreaterThan(t1/t2, expPerfGain);
         end
@@ -394,8 +447,8 @@ classdef IsPrimeTest < matlab.unittest.TestCase
             range = int32(range);
             evenIdx = mod(range, 2) == 0;
         	range(evenIdx) = range(evenIdx) + 1;
-            expPerfGain = 1.93;
-            measureSmallNumPerf(testCase, range, expPerfGain, 5);
+            expPerfGain = 1.52; % before: 1.92;
+            measureSmallNumPerf(testCase, range, expPerfGain, 8);
         end
 
         function perfArrayUint32(testCase)
@@ -405,7 +458,7 @@ classdef IsPrimeTest < matlab.unittest.TestCase
 
             t2 = timeit(@() isprime_fast(range)) + timeit(@() isprime_fast(range));
             t2 = t2/2;
-            expPerfGain = 2.1;
+            expPerfGain = 2.05;
             testCase.log(matlab.unittest.Verbosity.Terse, string("Act: " + t1/t2 + ", Exp: " + expPerfGain));
             testCase.verifyGreaterThan(t1/t2, expPerfGain);
         end
@@ -435,6 +488,31 @@ classdef IsPrimeTest < matlab.unittest.TestCase
             testCase.verifyGreaterThan(t1/t2, expPerfGain);
         end
 
+        function shortTinyPrimeArray(testCase)
+            % Short array of tiny primes
+            % ismember path
+            input = int16(1000):2500;
+            input = nextprime(input);
+            input = unique(input);
+            testCase.assertLength(input, 200);
+            expPerfGain = 3.67;
+            measureSmallNumPerf(testCase, input, expPerfGain, 40);
+        end
+
+        function perfSequenceShort(testCase)
+            % ismember path
+            range = 1:10000;
+            expPerfGain = 33.4;
+            measureSmallNumPerf(testCase, range, expPerfGain, 4);
+        end
+
+        function perfSequenceMed(testCase)
+            % ismember path
+            range = 1:100000;
+            expPerfGain = 70;
+            measureSmallNumPerf(testCase, range, expPerfGain, 1);
+        end
+
         function perfSequence(testCase)
             % ismember path
             range = 1:200000;
@@ -448,7 +526,7 @@ classdef IsPrimeTest < matlab.unittest.TestCase
             t2 = t2/4;
 
             testCase.assertEqual(isp1, isprime_fast(range));
-            expPerfGain = 92;
+            expPerfGain = 91.5;
             testCase.log(matlab.unittest.Verbosity.Terse, string("Act: " + t1/t2 + ", Exp: " + expPerfGain));
             testCase.verifyGreaterThan(t1/t2, expPerfGain);
 
@@ -479,6 +557,9 @@ function t2 = measureSmallNumPerf(testCase, number, expPerfGain, numTrials)
     end
 
     testCase.verifyGreaterThan(t1/t2, expPerfGain);
+    if t1/t2 > expPerfGain * 1.7
+        warning("Possible performance improvement");
+    end
 
     % return average speed of isprime_fast
     t2 = t2 / numTrials;
@@ -511,4 +592,7 @@ function measureSymbolic(testCase, num, expPerfGain)
 
     testCase.assertEqual(isprime_fast(num), isprime(symNum));
     testCase.verifyGreaterThan(t1/t2, expPerfGain);
+    if t1/t2 > expPerfGain * 1.7
+        warning("Possible performance improvement");
+    end
 end

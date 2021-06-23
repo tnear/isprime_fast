@@ -28,6 +28,7 @@ function isp = isprime_fast(N)
 
     maxValue = max(N(idxToCheck));
     persistent maxBytesAllowed;
+    % todo: cannot use persistent
     if isempty(maxBytesAllowed)
         maxBytesAllowed = getMaxBytesAllowed;
     end
@@ -101,20 +102,19 @@ function isp = isScalarPrime(N)
     % also convert N to integer so that mod() is faster
     if N <= 3
         isp = N == 2 || N == 3;
+    elseif N < 262144 % 2^18
+        isp = isSmallPrime(uint32(N));
     elseif N <= 4294967295 % 2^32 - 1
-        isp = isSmallPrime(uint32(N), uint32(3));
-    elseif N <= 549755813888 % 2^39
-        %isp = isSmallPrime(uint64(N), uint64(3));
-        isp = isMediumPrime(uint64(N));
+        isp = isMediumPrime(uint32(N));
     elseif N <= uint64(562949953421312) % 2^49
-        isp = isMediumPrime(uint64(N));
+        isp = isMediumPrime64(uint64(N));
     else
         % large primes, > 2^49
         isp = MillerRabinPrime(N);
     end
 end
 
-function isp = isSmallPrime(N, lowNumToStartChecking)
+function isp = isSmallPrime(N)
     if mod(N, 2) == 0
         isp = false;
     else
@@ -122,14 +122,37 @@ function isp = isSmallPrime(N, lowNumToStartChecking)
         upperBound = floor(sqrt(double(N)));
 
         % sequence of odd numbers: [5 7 9 11 13 ...]
-        seq = lowNumToStartChecking:2:upperBound;
+        seq = uint32(3):2:upperBound;
 
         % determine prime based on remainder
         isp = ~any(mod(N, seq) == 0);
     end
 end
 
+% create a [2 3 5 7]-prime wheel and check rem()
 function isp = isMediumPrime(N)
+    if any(mod(N, uint32([2, 3, 5, 7])) == 0)
+        isp = false;
+    else
+        % check up to sqrt(N)
+        upperBound = floor(sqrt(double(N)));
+
+        % [2 3 5 7]-wheel: [1, 11, 13, 17, 19, 23, 29, 31, 37, 41, ...]
+        % diff(wheel) = [10, 2, 4, 2, 4, 6, 2, 6, 4, ...]
+        % create sequence of differences of elements up to sqrt(N) after
+        % multiples of 2, 3, 5, and 7 removed
+        alternate = uint32([10 2 4 2 4 6 2 6 4 2 4 6 6 2 6 4 2 6 4 6 8 ...
+            4 2 4 2 4 8 6 4 6 2 4 6 2 6 6 4 2 4 6 2 6 4 2 4 2 10 2]);
+        timesToRepeat = floor(upperBound / 210) + 1; % cycle repeats every 2*3*5*7 = 210
+        seq = cumsum(repmat(alternate, [1, timesToRepeat])) + 1;
+
+        % determine prime based on remainder
+        isp = ~any(mod(N, seq) == 0);
+    end
+end
+
+% same as isMediumPrime for uint64
+function isp = isMediumPrime64(N)
     if any(mod(N, uint64([2, 3, 5, 7])) == 0)
         isp = false;
     else
@@ -156,6 +179,13 @@ function maxBytesAllowed = getMaxBytesAllowed
 end
 
 function bool = takeSquareRootPath(numElements, maxValue)
-    %bool = 500 * numElements < maxValue; % old heuristic
-    bool = 807.6 * numElements - 125648578 < maxValue;
+    %bool = 500 * numElements < maxValue;               % 1st heuristic
+    %bool = 807.6 * numElements - 125648578 < maxValue; % 2nd heuristic
+    %bool = 560 * numElements - 1900000 < maxValue;     % 3rd heuristic
+    if numElements < 30000
+        bool = 275 * numElements - 50000 < maxValue;
+    else
+        bool = 613 * numElements - 60000000 < maxValue;
+    end
+    %bool = false;
 end

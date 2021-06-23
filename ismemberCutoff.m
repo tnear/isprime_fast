@@ -17,6 +17,13 @@ classdef ismemberCutoff < matlab.unittest.TestCase
             % .008 seconds
         end
 
+        function randomOdd2(~)
+            input = randi([2^19 2^23], [1 30000]);
+            input(mod(input, 2) == 0) = input(mod(input, 2) == 0) + 1;
+            t1 = timeit(@() isprimeTemp(input))
+            t2 = timeit(@() isprime_fast(input))
+        end
+
         function randomOddSmallPrimesRemoved(~)
             input = randi([2^22 2^27], [1 185000]);
             % make input odd
@@ -80,7 +87,7 @@ classdef ismemberCutoff < matlab.unittest.TestCase
             % .001 seconds
         end
 
-        function normDistrib(~)
+        function normalDistrib(~)
             input = abs(floor(normrnd(1e8, 1e7, [1, 650000])));
             disp("Max: " + max(input));
             disp("Min: " + min(input));
@@ -114,25 +121,52 @@ classdef ismemberCutoff < matlab.unittest.TestCase
             tic, isprimeTemp(input); toc
             tic, isprime_fast(input); toc
         end
+
+        function perfArrayInt32Odd(testCase)
+            % sqrt path near threshold
+            input = randi([1e5, 1e6], 1, 4900);
+            input = int32(input);
+            evenIdx = mod(input, 2) == 0;
+        	input(evenIdx) = input(evenIdx) + 1;
+            timeit(@() isprimeTemp(input))
+            timeit(@() isprime_fast(input))
+        end
+
+        function shortTinyPrimeArray(testCase)
+            % Short array of tiny primes
+            % ismember path
+            input = int16(1000):1060;
+            input = nextprime(input);
+            input = unique(input);
+            disp(size(input));
+            timeit(@() isprimeTemp(input))
+            timeit(@() isprime_fast(input))
+        end
         
         function bestFit(~)
             close all;
             % raw data:
-            %numElements = [125, 1000,      1350, 10000, 185000, 650000, 850000, 1500000, 2400000, 2530000, 5000000];
-            %maxValue =    [10000, 100000, 270000, 2^21, 2^27, 150000000, 2^32,    3.1e9,    2^30,   2^33,   2^33];
-            %  data used for best fit:
-            numElements = [125,     1000, 1350, 10000, 185000, 650000, 2400000, 5000000];
-            maxValue =    [10000, 100000, 270000, 2^21, 2^27, 150000000, 2^30, 2^32];
+            %numElements = [10,     125,   1000,   1350, 4900, 10000, 30000, 185000, 650000, 850000, 1500000, 2400000, 2530000, 5000000];
+            %maxValue =    [1060, 10000, 100000, 270000, 1e6,   2^21, 8.3e6,  2^27, 150000000, 2^32,    3.1e9,    2^30,   2^33,   2^33];
+            % data used for best fit -- just contains the lower maxValue points
+            numElements = [10,   25,     125,   1000, 1350,   4900,  10000, 30000, 185000, 650000, 2400000, 3300000, 5000000];
+            maxValue =    [1061, 30000 44000, 100000, 270000, 1e6,    2^21, 8.3e6, 2^27, 290000000,  2^30,  1.3e9,  3.3e9];
+            %numElements = [185000, 650000, 2400000, 3300000, 5000000];
+            %maxValue =    [2^27, 290000000,  2^30,  1.3e9,  3.3e9];
             oldHeuristic = numElements * 500;
             xlabel('Number of elements');
             ylabel('Max value');
             % linear fit
-            coefficients = polyfit(numElements, maxValue, 1);
+            [coefficients, S] = polyfit(numElements, maxValue, 1);
+            disp(vpa(coefficients).');
             fittedVals = polyval(coefficients, numElements);
+            Rsqr = 1 - (S.normr/norm(maxValue - mean(maxValue)))^2;
             hold on;
             plot(numElements, maxValue);
             plot(numElements, fittedVals);
             plot(numElements, oldHeuristic);
+            title("R^2 = " + Rsqr);
+            legend("Max value", "Best fit", "Original fit");
         end
     end
 end

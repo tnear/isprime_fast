@@ -17,7 +17,7 @@ classdef IsPrimeTest2 < matlab.unittest.TestCase
 
         function mediumPrime(testCase)
             % medium prime is between 2^39 and 2^49
-            max = 1000;
+            max = 2000;
             out = false(1, max);
             N = randi([2^39, 2^49], [1, max]);
             evenIdx = mod(N, 2) == 0;
@@ -26,7 +26,7 @@ classdef IsPrimeTest2 < matlab.unittest.TestCase
                 out(x) = isprime_fast(N(x));
             end
             testCase.assertEqual(out, isprime(sym(N)), "Failed for: " + N);
-            % 15 seconds
+            % 30 seconds
         end
 
         function Int64Array(testCase)
@@ -82,6 +82,7 @@ classdef IsPrimeTest2 < matlab.unittest.TestCase
             range = [np, 1, np, 2, uint64(7.2e16) + 1, 3];
             expPerfGain = 15.8; % was 10.2;
             measureArrayPerf(testCase, range, expPerfGain, 2);
+            % 4 seconds
         end
 
         function perfArrayE18(testCase)
@@ -101,7 +102,7 @@ classdef IsPrimeTest2 < matlab.unittest.TestCase
 
         function allButOneTinyNumber(testCase)
             range = [repelem(1, 10000000), uint64(4.7e18)];
-            expPerfGain = 37.5;
+            expPerfGain = 36.5;
             measureArrayPerf(testCase, range, expPerfGain);
             % 38 seconds
         end
@@ -156,7 +157,7 @@ classdef IsPrimeTest2 < matlab.unittest.TestCase
             range = randi([7e8, 7.5e8], 1, 1300000);
             evenIdx = mod(range, 2) == 0;
         	range(evenIdx) = range(evenIdx) + 1;
-            expPerfGain = 18;
+            expPerfGain = 17.8;
             measureArrayPerf(testCase, range, expPerfGain, 1);
             % 100 seconds
         end
@@ -184,13 +185,13 @@ classdef IsPrimeTest2 < matlab.unittest.TestCase
         end
         
         function scalarCutoffPerf(~)
-            % same cutoffs on pc1, pc2, and linux1
+            % same cutoffs on pc1, pc2, linux, and mac
             % tic; isprime(nextprime(uint64(1.15e18))); toc
-            % doubles from  15 ->  30 seconds at 4.6e18:  intmax("int64")/2
-            % doubles from   7 ->  15 seconds at 1.15e18: intmax("int64")/8
-            % doubles from 3.5 ->   7 seconds at 2.88e17: intmax("int64")/32
-            % doubles from 1.8 -> 3.5 seconds at 7.2e16:  intmax("int64")/128
-            % doubles from  .9 -> 1.8 seconds at 1.8e16:  intmax("int64")/512
+            % doubles from  15 ->  30 seconds at 4.6e18:  2^62
+            % doubles from   7 ->  15 seconds at 1.15e18: 2^60
+            % doubles from 3.5 ->   7 seconds at 2.88e17: 2^58
+            % doubles from 1.8 -> 3.5 seconds at 7.2e16:  2^56
+            % doubles from  .9 -> 1.8 seconds at 1.8e16:  2^54
         end
 
         function isPrimeLarge(~)
