@@ -162,6 +162,13 @@ classdef IsPrimeTest2 < matlab.unittest.TestCase
             % 100 seconds
         end
 
+        function exception(testCase)
+            % this function induces the try/catch in isprime_fast,
+            % however it takes a very long time to run
+            input = repelem(flintmax/262144 + 5, 100000000);
+            %isprime_fast(input);
+        end
+
         function roughlyEven(~)
             % compares sqrt(N) with N + ismember
             % todo: max > 1e8

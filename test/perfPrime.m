@@ -1,24 +1,26 @@
 classdef perfPrime < matlab.unittest.TestCase
-    methods (Test)
-        function [t1, t2, t3] = perfScalar(~)
-            numBits = 24;
-            checkPrime = true;
-            % checkPrime = false: check odd numbers
-            % checkPrime = true: check prime numbers (often worse-case)
-            t1 = [];
-            t2 = [];
-            t3 = [];
-            for idx = 1:50
-                [x, y, z] = getPerf(numBits, checkPrime);
-                t1 = [t1, x]; %#ok<AGROW>
-                t2 = [t2, y]; %#ok<AGROW>
-                t3 = [t3, z]; %#ok<AGROW>
+    methods (Static)
+        function [tIsPrime, tIsPrimeFast, tSymIsPrime] = perfScalar(numBits, typeCheck)
+            % typeCheck = 0: random prime numbers (often worse-case)
+            % typeCheck = 1: random odd numbers
+            % typeCheck = 2: random numbers
+            % ex usage: [tIsPrime, tIsPrimeFast, tSymIsPrime] = perfPrime.perfScalar(32, 0)
+            tIsPrime = [];
+            tIsPrimeFast = [];
+            tSymIsPrime = [];
+            for idx = 1:100
+                [x, y, z] = getPerf(numBits, typeCheck);
+                tIsPrime = [tIsPrime, x]; %#ok<AGROW>
+                tIsPrimeFast = [tIsPrimeFast, y]; %#ok<AGROW>
+                tSymIsPrime = [tSymIsPrime, z]; %#ok<AGROW>
             end
-            t1 = mean(t1);
-            t2 = mean(t2);
-            t3 = mean(t3);
+            tIsPrime = mean(tIsPrime);
+            tIsPrimeFast = mean(tIsPrimeFast);
+            tSymIsPrime = mean(tSymIsPrime);
         end
+    end
 
+    methods (Test)
         function incrementingSequence(~)
             arr = 1:10000000;
             % 139 seconds
@@ -29,7 +31,6 @@ classdef perfPrime < matlab.unittest.TestCase
 
             sArr = sym(arr);
             tic, isprime(sArr); toc; 
-            % todo: time this
         end
 
         function int32Matrix(~)
@@ -100,6 +101,8 @@ classdef perfPrime < matlab.unittest.TestCase
             disp("Min: " + min(input));
             tic, isprime(input); toc
             timeit(@() isprime_fast(input))
+            %sInput = sym(input);
+            %tic, isprime(sInput); toc
             % 11 seconds
         end
 
@@ -109,22 +112,33 @@ classdef perfPrime < matlab.unittest.TestCase
             % convert to odd numbers
             evenIdx = mod(input, 2) == 0;
             input(evenIdx) = input(evenIdx) + 1;
-            %input = nextprime(input);
-            %input = repmat(input, [1, 20]);
             disp(size(input));
             disp("Max: " + max(input));
             disp("Min: " + min(input));
             tic, isprime(input); toc
             tic, isprime_fast(input); toc
+            %sInput = sym(input);
+            %tic, isprime(sInput); toc
             % 21 seconds
+        end
+
+        function normalDistribBits53(~)
+            % Normal distribution of 1,000 random odd numbers with mean 2^53
+            input = abs(floor(normrnd(2^53, 2^51, [1, 1000])));
+            disp(size(input));
+            disp("Max: " + max(input));
+            disp("Min: " + min(input));
+            tic, isprime(input); toc
+            tic, isprime_fast(input); toc
+            % 80 seconds
         end
 
         function shortTinyPrimeArray(testCase)
             % Short array of tiny primes
-            input = 1000:2000;
+            input = int16(1000):2500;
             input = nextprime(input);
             input = unique(input);
-            testCase.assertLength(input, 136);
+            testCase.assertLength(input, 200);
             sInput = sym(input);
 
             t1 = 0;
@@ -141,18 +155,57 @@ classdef perfPrime < matlab.unittest.TestCase
             disp(t2);
             disp(t3);
         end
+
+        function largest64BitOddNumbers(testCase)
+            numElements = 100;
+            input = intmax("uint64") : -2 : intmax("uint64") - 2 * numElements + 2;
+            testCase.assertNumElements(input, numElements);
+            tic, isprime(input); toc
+            tic, isprime_fast(input); toc
+            sInput = sym(input);
+            tic, isprime(sInput); toc
+
+            % isprime:
+            % 100 elements, 201 seconds
+            % 1000 elements, 1736 seconds
+            % 5000 elements, 8816 seconds
+        end
+
+        function plotOfPrimeOddEven(~)
+            % perfPrime.plotOfPrimeOddEven
+            close all;
+            numBits = [4 8 16 24 32 36 40 44 48 50 52 56 60 64];
+
+            % isprime_fast times faster over isprime for each bit size
+            primeNum = [6.07 5.63 6.49 7.52 7.65 3.89 2.45 3.00 2.90 5.83 9.21 32.9 98.6 266 ];
+            oddNum = [5.82 5.56 6.68 13.1 18.1 17.0 5.48 6.98 7.1 25 51 192 564 1620] ;
+            randNum = [7.39 7.64 10.7 21.7 31.9 16.5 12.4 14.7 15.1 52.6 94.4 340 1122 2953];
+
+            lineWidth = 1.1;
+            semilogy(numBits, primeNum, "LineWidth", lineWidth);
+            hold on;
+            grid on;
+            semilogy(numBits, oddNum, "LineWidth", lineWidth);
+            semilogy(numBits, randNum, "LineWidth", lineWidth);
+            title("isprime\_fast speedup factor compared to isprime", "FontSize", 12);
+            yticklabels([1, 10, 100, 1000, 10000]);
+            xlabel("Bit-size of scalar input");
+            ylabel("Number of times faster");
+            legend(["Random prime numbers", "Random odd numbers", "Random numbers"], ...
+                "Location", "northwest", "FontSize", 11);
+        end
     end
 end
 
-function [t1, t2, t3] = getPerf(numBits, checkPrime)
+function [tIsPrime, tIsPrimeFast, tSymIsPrime] = getPerf(numBits, typeCheck)
     low = 2^(numBits - 1);
     high = 2^numBits - 1;
+    num = 4; % placeholder value
     if numBits >= 53
-        num = 4;
-        if checkPrime
+        if typeCheck == 0
             num = uint64(2)^numBits - randi(2^53 - 1);
             num = prevprime(num);
-        else
+        elseif typeCheck == 1
             while mod(num, 2) == 0
                 % randi only supports < 2^53
                 % instead take high number and subtract largest randi range
@@ -160,33 +213,36 @@ function [t1, t2, t3] = getPerf(numBits, checkPrime)
                 % for basic performance testing
                 num = uint64(2)^numBits - randi(2^53 - 1);
             end
+        else
+            num = uint64(2)^numBits - randi(2^53 - 1);
         end
     else
-        num = 4;
-        if checkPrime
+        if typeCheck == 0
             num = nextprime(randi([low, high]));
-        else
+        elseif typeCheck == 1
             while mod(num, 2) == 0
                 num = randi([low, high]);
             end
+        else
+            num = randi([low, high]);
         end
     end
 
-    if checkPrime
+    if typeCheck == 0
         assert(isprime(sym(num)));
-    else
+    elseif typeCheck == 1
         assert(mod(num, 2) == 1);
     end
 
     if num < 2^47
-        t1 = timeit(@() isprime(num));
+        tIsPrime = timeit(@() isprime(num));
     else
-        % built-in becomes a little slow for timeit
+        % isprime becomes a little slow for timeit
         tic;
-        %isprime(num);
-        t1 = toc;
+        isprime(num);
+        tIsPrime = toc;
     end
-    t2 = timeit(@() isprime_fast(num));
+    tIsPrimeFast = timeit(@() isprime_fast(num));
     sNum = sym(num);
-    t3 = timeit(@() isprime(sNum));
+    tSymIsPrime = timeit(@() isprime(sNum));
 end

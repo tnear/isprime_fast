@@ -145,28 +145,53 @@ classdef ismemberCutoff < matlab.unittest.TestCase
         
         function bestFit(~)
             close all;
+            legendText = {["Measured Data", "Linear Fit"], "Location", "northwest", ...
+                "FontSize", 11};
             % raw data:
             %numElements = [10,     125,   1000,   1350, 4900, 10000, 30000, 185000, 650000, 850000, 1500000, 2400000, 2530000, 5000000];
             %maxValue =    [1060, 10000, 100000, 270000, 1e6,   2^21, 8.3e6,  2^27, 150000000, 2^32,    3.1e9,    2^30,   2^33,   2^33];
             % data used for best fit -- just contains the lower maxValue points
-            numElements = [10,   25,     125,   1000, 1350,   4900,  10000, 30000, 185000, 650000, 2400000, 3300000, 5000000];
-            maxValue =    [1061, 30000 44000, 100000, 270000, 1e6,    2^21, 8.3e6, 2^27, 290000000,  2^30,  1.3e9,  3.3e9];
-            %numElements = [185000, 650000, 2400000, 3300000, 5000000];
-            %maxValue =    [2^27, 290000000,  2^30,  1.3e9,  3.3e9];
-            oldHeuristic = numElements * 500;
+            %numElements = [10,   25,     125,   1000, 1350,   4900,  10000, 30000, 185000, 650000, 2400000, 3300000, 5000000];
+            %maxValue =    [1061, 30000 44000, 100000, 270000, 1e6,    2^21, 8.3e6, 2^27, 290000000,  2^30,  1.3e9,  3.3e9];
+
+            % low data
+            lowElements = [10,   25,     125,   1000, 1350,   4900,  10000, 30000];
+            lowMaxValue =    [1061, 30000 44000, 100000, 270000, 1e6,    2^21, 8.3e6];
+            subplot(2, 1, 1);
+            
             xlabel('Number of elements');
             ylabel('Max value');
             % linear fit
-            [coefficients, S] = polyfit(numElements, maxValue, 1);
+            [coefficients, S] = polyfit(lowElements, lowMaxValue, 1);
             disp(vpa(coefficients).');
-            fittedVals = polyval(coefficients, numElements);
-            Rsqr = 1 - (S.normr/norm(maxValue - mean(maxValue)))^2;
+            lowFittedVals = polyval(coefficients, lowElements);
+            Rsqr = 1 - (S.normr/norm(lowMaxValue - mean(lowMaxValue)))^2;
             hold on;
-            plot(numElements, maxValue);
-            plot(numElements, fittedVals);
-            plot(numElements, oldHeuristic);
-            title("R^2 = " + Rsqr);
-            legend("Max value", "Best fit", "Original fit");
+            plot(lowElements, lowMaxValue);
+            plot(lowElements, lowFittedVals);
+            grid on;
+            legend(legendText{:});
+            title("Low Number of Elements, R^2 = " + Rsqr, "FontSize", 11);
+
+            % high data
+            highElements = [185000, 650000, 2400000, 3300000, 5000000];
+            highMaxValue =    [2^27, 290000000,  2^30,  1.3e9,  3.3e9];
+            subplot(2, 1, 2);
+            hold on;
+
+            % linear fit
+            [coefficients, S] = polyfit(highElements, highMaxValue, 1);
+            disp(vpa(coefficients).');
+            highFittedVals = polyval(coefficients, highElements);
+            Rsqr = 1 - (S.normr/norm(highMaxValue - mean(highMaxValue)))^2;
+            plot(highElements, highMaxValue);
+            plot(highElements, highFittedVals);
+            grid on;
+            xlabel("Number of elements");
+            ylabel("Max value");
+            
+            title("High Number of Elements, R^2 = " + Rsqr, "FontSize", 11);
+            legend(legendText{:});
         end
     end
 end

@@ -27,12 +27,6 @@ function isp = isprime_fast(N)
     end
 
     maxValue = max(N(idxToCheck));
-    persistent maxBytesAllowed;
-    % todo: cannot use persistent
-    if isempty(maxBytesAllowed)
-        maxBytesAllowed = getMaxBytesAllowed;
-    end
-
     if isInt64Flintmax(N, maxValue)
         % for numbers higher than flintmax, use Miller-Rabin
         remainingN = N(idxToCheck);
@@ -51,15 +45,21 @@ function isp = isprime_fast(N)
         assert(maxValue < flintmax);
     end
 
-    if maxValue > maxBytesAllowed || takeSquareRootPath(numel(N), maxValue)
-        % get primes up to sqrt(maxValue of N)
-        upperBound = cast(sqrt(double(maxValue)), class(N));
-    else
-        % heuristic: get ALL primes up to maxValue of N
+    if takeIsMemberPath(numel(N), maxValue)
+        % get ALL primes up to max(N)
         upperBound = cast(double(maxValue), class(N));
+    else
+        % get primes up to sqrt(max(N))
+        upperBound = cast(sqrt(double(maxValue)), class(N));
     end
 
-    p = primes(upperBound);
+    try
+        p = primes(upperBound);
+    catch
+        % out of memory for ismember, use sqrt instead
+        upperBound = cast(sqrt(double(maxValue)), class(N));
+        p = primes(upperBound);
+    end
 
     if upperBound < maxValue
         if issparse(N)
@@ -140,7 +140,7 @@ function isp = isMediumPrime(N)
         % [2 3 5 7]-wheel: [1, 11, 13, 17, 19, 23, 29, 31, 37, 41, ...]
         % diff(wheel) = [10, 2, 4, 2, 4, 6, 2, 6, 4, ...]
         % create sequence of differences of elements up to sqrt(N) after
-        % multiples of 2, 3, 5, and 7 removed
+        % multiples of 2, 3, 5, and 7 are removed
         alternate = uint32([10 2 4 2 4 6 2 6 4 2 4 6 6 2 6 4 2 6 4 6 8 ...
             4 2 4 2 4 8 6 4 6 2 4 6 2 6 6 4 2 4 6 2 6 4 2 4 2 10 2]);
         timesToRepeat = floor(upperBound / 210) + 1; % cycle repeats every 2*3*5*7 = 210
@@ -170,22 +170,13 @@ function isp = isMediumPrime64(N)
     end
 end
 
-function maxBytesAllowed = getMaxBytesAllowed
-    % return largest uint64/double allowable array
-    % if max(N) is greater than this number, take sqrt(N) path as returning
-    % all primes will error
-    userview = memory;
-    maxBytesAllowed = userview.MaxPossibleArrayBytes * 8; % 8-byte (64-bit) integers
-end
-
-function bool = takeSquareRootPath(numElements, maxValue)
-    %bool = 500 * numElements < maxValue;               % 1st heuristic
-    %bool = 807.6 * numElements - 125648578 < maxValue; % 2nd heuristic
-    %bool = 560 * numElements - 1900000 < maxValue;     % 3rd heuristic
-    if numElements < 30000
-        bool = 275 * numElements - 50000 < maxValue;
+function bool = takeIsMemberPath(numElements, maxValue)
+    %bool = 500 * numElements > maxValue;               % 1st heuristic
+    %bool = 807.6 * numElements - 125648578 > maxValue; % 2nd heuristic
+    %bool = 560 * numElements - 1900000 > maxValue;     % 3rd heuristic
+    if numElements < 30000                              % 4th heuristic
+        bool = 275 * numElements - 50000 > maxValue;
     else
-        bool = 613 * numElements - 60000000 < maxValue;
+        bool = 613 * numElements - 60000000 > maxValue;
     end
-    %bool = false;
 end

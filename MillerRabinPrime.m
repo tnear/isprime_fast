@@ -1,4 +1,6 @@
 function isp = MillerRabinPrime(n)
+    % Rabin, Michael O. (1980), "Probabilistic algorithm for testing primality",
+    % Journal of Number Theory, 12 (1): 128–138
     isp = true;
     n = n(:);
 
@@ -17,8 +19,10 @@ function isp = MillerRabinPrime(n)
         d = d / 2;
     end
 
-    % https://miller-rabin.appspot.com/
     % deterministic bases for Miller-Rabin up to 2^64
+    % Sinclair, J. (n.d.). Deterministic variants of the Miller-Rabin
+    % primality test. Deterministic variants of the Miller-Rabin primality
+    % test. Miller-Rabin SPRP bases records. https://miller-rabin.appspot.com/.
     if n >= 3071837692357849
         numsToTry = [2, 325, 9375, 28178, 450775, 9780504, 1795265022];
     elseif n < 1373653
