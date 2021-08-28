@@ -167,11 +167,13 @@ classdef ismemberCutoff < matlab.unittest.TestCase
             lowFittedVals = polyval(coefficients, lowElements);
             Rsqr = 1 - (S.normr/norm(lowMaxValue - mean(lowMaxValue)))^2;
             hold on;
-            plot(lowElements, lowMaxValue);
-            plot(lowElements, lowFittedVals);
-            grid on;
-            legend(legendText{:});
-            title("Low Number of Elements, R^2 = " + Rsqr, "FontSize", 11);
+            lineWidth = 1.7;
+            plot(lowElements, lowMaxValue, "LineWidth", lineWidth);
+            plot(lowElements, lowFittedVals, "LineWidth", lineWidth, "LineStyle", "--");
+            text(1500, 8e6, "A");
+            %grid on;
+            %legend(legendText{:});
+            %title("Low Number of Elements, R^2 = " + Rsqr, "FontSize", 11);
 
             % high data
             highElements = [185000, 650000, 2400000, 3300000, 5000000];
@@ -184,14 +186,15 @@ classdef ismemberCutoff < matlab.unittest.TestCase
             disp(vpa(coefficients).');
             highFittedVals = polyval(coefficients, highElements);
             Rsqr = 1 - (S.normr/norm(highMaxValue - mean(highMaxValue)))^2;
-            plot(highElements, highMaxValue);
-            plot(highElements, highFittedVals);
-            grid on;
+            plot(highElements, highMaxValue, "LineWidth", lineWidth);
+            plot(highElements, highFittedVals, "LineWidth", lineWidth, "LineStyle", "--");
+            text(2.6e5, 3.25e9, "B");
+            %grid on;
             xlabel("Number of elements");
             ylabel("Max value");
             
-            title("High Number of Elements, R^2 = " + Rsqr, "FontSize", 11);
-            legend(legendText{:});
+            %title("High Number of Elements, R^2 = " + Rsqr, "FontSize", 11);
+            %legend(legendText{:});
         end
     end
 end

@@ -181,13 +181,13 @@ classdef perfPrime < matlab.unittest.TestCase
             oddNum = [5.82 5.56 6.68 13.1 18.1 17.0 5.48 6.98 7.1 25 51 192 564 1620] ;
             randNum = [7.39 7.64 10.7 21.7 31.9 16.5 12.4 14.7 15.1 52.6 94.4 340 1122 2953];
 
-            lineWidth = 1.1;
+            lineWidth = 1.8;
             semilogy(numBits, primeNum, "LineWidth", lineWidth);
             hold on;
             grid on;
-            semilogy(numBits, oddNum, "LineWidth", lineWidth);
-            semilogy(numBits, randNum, "LineWidth", lineWidth);
-            title("isprime\_fast speedup factor compared to isprime", "FontSize", 12);
+            semilogy(numBits, oddNum, "LineWidth", lineWidth, "LineStyle", "--");
+            semilogy(numBits, randNum, "LineWidth", lineWidth, "LineStyle", "-.");
+            %title("isprime\_fast speedup factor compared to isprime", "FontSize", 12);
             yticklabels([1, 10, 100, 1000, 10000]);
             xlabel("Bit-size of scalar input");
             ylabel("Number of times faster");
