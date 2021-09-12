@@ -1,3 +1,7 @@
+% isprime_fast is a drop-in replacement for MATLAB's isprime().
+% isprime_fast is typically 5 to 10 times faster than isprime for small
+% integers and hundreds of times faster for large integers and long arrays.
+% More information and example benchmarks on GitHub: https://github.com/tnear/isprime_fast
 function isp = isprime_fast(N)
     isp = false(size(N));
     if isempty(N)
