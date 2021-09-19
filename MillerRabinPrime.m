@@ -21,8 +21,8 @@ function isp = MillerRabinPrime(n)
 
     % deterministic bases for Miller-Rabin up to 2^64
     % Sinclair, J. (n.d.). Deterministic variants of the Miller-Rabin
-    % primality test. Deterministic variants of the Miller-Rabin primality
-    % test. Miller-Rabin SPRP bases records. https://miller-rabin.appspot.com/.
+    % primality test.
+    % Miller-Rabin SPRP bases records. https://miller-rabin.appspot.com/.
     if n >= 3071837692357849
         numsToTry = [2, 325, 9375, 28178, 450775, 9780504, 1795265022];
     elseif n < 1373653
