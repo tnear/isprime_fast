@@ -51,7 +51,7 @@ Elapsed time is 0.018214 seconds.
 
 ### Scalar performance comparison of various bit-sizes for *isprime_fast*, *isprime*, and Symbolic Math Toolbox's *sym/isprime*
 ```
-Random prime numbers (2.4x to 260x speedup over isprime):
+Random prime numbers (2.4x to 260x isprime_fast speedup over isprime):
 Bit-size  isprime_fast  isprime     Perf speedup  sym/isprime  Perf speedup
 4         7.7654e-07    4.7186e-06  6.07x         0.002166     2789x
 8         1.0120e-06    5.7043e-06  5.63x         0.00209      2066x
@@ -67,7 +67,7 @@ Bit-size  isprime_fast  isprime     Perf speedup  sym/isprime  Perf speedup
 60        0.0755        7.4418      98.6x         0.0280       0.370x
 64        0.1194        31.8824     266x          0.0287       0.234x
 
-Random odd numbers (5.4x to 1600x speedup over isprime):
+Random odd numbers (5.4x to 1600x isprime_fast speedup over isprime):
 Bit-size  isprime_fast  isprime     Perf speedup  sym/isprime  Perf speedup
 4         7.9037e-07    4.5998e-06  5.82x         0.00211      2668x
 8         9.8097e-07    5.4535e-06  5.56x         0.0020       2084x
@@ -83,7 +83,7 @@ Bit-size  isprime_fast  isprime     Perf speedup  sym/isprime  Perf speedup
 60        0.01316       7.4327      564x          0.003645     0.277x
 64        0.0196        31.7576     1620x         0.0034       0.174x
 
-Random numbers (7.3x to 2950x speedup over isprime):
+Random numbers (7.3x to 2950x isprime_fast speedup over isprime):
 Bit-size  isprime_fast  isprime     Perf speedup  sym/isprime  Perf speedup
 4         5.4788e-07    4.0505e-06  7.39x         0.002046     3734x
 8         7.1275e-07    5.4507e-06  7.64x         0.002103     2950x
