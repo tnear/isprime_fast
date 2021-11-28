@@ -13,7 +13,7 @@ ans =
    0   1   1   0   1
 ```
 
-## Performance
+## Performance comparison between *isprime* and *isprime_fast*
 ### Incrementing sequence
 ```MATLAB
 >> N = 1:100000000; % 1 to 100 million
