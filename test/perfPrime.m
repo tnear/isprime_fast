@@ -1,3 +1,4 @@
+% Utility class used to create performance tables and plots
 classdef perfPrime < matlab.unittest.TestCase
     methods (Static)
         function [tIsPrime, tIsPrimeFast, tSymIsPrime] = perfScalar(numBits, typeCheck)
