@@ -1,3 +1,4 @@
+% Regression and performance tests for the Miller-Rabin primality check
 classdef MillerRabinTest < matlab.unittest.TestCase
     properties(TestParameter)
         bugs = {3215031751, uint64(9007199254740997), uint64(3825123056546413051), uint64(15575474027814488189)};
