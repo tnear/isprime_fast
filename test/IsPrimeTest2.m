@@ -1,5 +1,6 @@
 classdef IsPrimeTest2 < matlab.unittest.TestCase
-    % more tests for isprime_fast. These are slower than the tests in IsPrimeTest.m
+    % Additional regression and performance tests for isprime_fast.
+    % These are slower than the tests in IsPrimeTest.m
     methods (Test)
         function smallScalars(testCase)
             max = 1000000;
