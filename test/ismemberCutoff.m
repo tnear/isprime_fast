@@ -1,3 +1,5 @@
+% Heuristic tests to find when ismember (all primes up to N)
+% and trial division of primes up to sqrt(N) perform equally
 classdef ismemberCutoff < matlab.unittest.TestCase
     methods (Test)
         function random32BitPrimes(~)
