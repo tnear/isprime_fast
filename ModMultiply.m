@@ -1,6 +1,9 @@
 % calculate (a * b) % m without overflowing uint64
 % private function which does minimal input validation
-% https://en.wikipedia.org/wiki/Modular_arithmetic#Example_implementations
+% This implementation takes inspiration from
+%    https://en.wikipedia.org/wiki/Modular_arithmetic#Example_implementations
+% however it also includes several vectorized optimizations and fast-paths to boost performance
+
 function result = ModMultiply(a, b, m)
     % faster calculation for non-overflowing multiplication
     c = a * b;
