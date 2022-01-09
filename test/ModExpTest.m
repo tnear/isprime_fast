@@ -1,4 +1,4 @@
-% Tests for modular exponentiation (ModExp): a ^ b (mod m)
+% Regression and performance tests for modular exponentiation (ModExp): a ^ b (mod m)
 % Uses Symbolic Toolbox's 'powermod' function to verify correct result
 classdef ModExpTest < matlab.unittest.TestCase
     methods (Test)
