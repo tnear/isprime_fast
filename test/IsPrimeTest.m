@@ -1,4 +1,4 @@
-% Fast and mostly comprehensive tests for isprime_fast
+% Fast and mostly comprehensive regression and performance tests for isprime_fast
 classdef IsPrimeTest < matlab.unittest.TestCase
     properties (TestParameter)
         emptyValues = {[], double.empty(1,0), int32.empty(0,2), cell.empty};
