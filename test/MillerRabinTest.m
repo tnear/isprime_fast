@@ -16,6 +16,7 @@ classdef MillerRabinTest < matlab.unittest.TestCase
             end
         end
 
+        % Input validation is now performed by isprime_fast to improve speed of M-R check
         %function emptyArray(testCase)
         %    testCase.assertEqual(MillerRabinPrime([]), isprime([]));
         %    testCase.assertEqual(MillerRabinPrime(uint8.empty), isprime(uint8.empty));
