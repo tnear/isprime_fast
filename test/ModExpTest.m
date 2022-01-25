@@ -1,5 +1,6 @@
 % Regression and performance tests for modular exponentiation (ModExp): a ^ b (mod m)
-% Uses Symbolic Toolbox's 'powermod' function to verify correct result
+% isprime_fast does not depend on the Symbolic Toolbox, however this test file 
+% uses Symbolic's 'powermod' function to verify the correct result
 classdef ModExpTest < matlab.unittest.TestCase
     methods (Test)
         function firstTest(testCase)
@@ -83,6 +84,7 @@ classdef ModExpTest < matlab.unittest.TestCase
             testCase.assertEqual(ModExp(uint64(2), 65, 0), powermod(uint64(2), 65, 0));
 
             % > uint64 max error
+            % note: ModExp no longer validates inputs because it is a utility function.
             %{
             args = {2^95, 3, 4};
             testCase.assertError(@() ModExp(args{:}), "MATLAB:assertion:failed");
