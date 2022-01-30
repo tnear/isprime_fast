@@ -5,7 +5,7 @@
 ## Syntax
 The syntax for *isprime_fast* is identical to *isprime*. It accepts an input array then returns which elements are prime. The only difference lies in the techniques used to determine primality.
 ```
->> isprime_fast([1, 2, 3, 4, 5])
+>> isprime_fast([1, 2, 3, 4, 5]) % or, equivalently, isprime([1, 2, 3, 4, 5])
 ans =
 
   1×5 logical array
