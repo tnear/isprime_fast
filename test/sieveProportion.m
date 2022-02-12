@@ -1,7 +1,6 @@
 % Helper utility for calculating prime metadata (not directly used by isprime_fast)
 function [proportionOfNewPrime, numAdded, cycle] = sieveProportion(prime)
     assert(isprime(prime));
-    % proportionOfNewPrime is the percentage of
     p = primes(prime);
     cycle = prod(p);
     result = false(1, cycle);
