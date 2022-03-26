@@ -1,6 +1,6 @@
 # isprime_fast
 
-**_isprime_fast_** (https://arxiv.org/abs/2108.04791) improves the performance of MATLAB's documented [*isprime*](https://www.mathworks.com/help/matlab/ref/isprime.html) function. *isprime_fast* uses modular arithmetic techniques, the Miller—Rabin primality test, vectorized operations, and division-minimizing strategies which harness the power of MATLAB's language. *isprime_fast* requires no arbitrary-precision arithmetic, C/C++ source code, or external libraries—it is entirely implemented in MATLAB. The results are typically 5 to 10 times faster for small integers and hundreds (or thousands) of times faster for large integers and long arrays. test
+**_isprime_fast_** (https://arxiv.org/abs/2108.04791) improves the performance of MATLAB's documented [*isprime*](https://www.mathworks.com/help/matlab/ref/isprime.html) function. *isprime_fast* uses modular arithmetic techniques, the Miller—Rabin primality test, vectorized operations, and division-minimizing strategies which harness the power of MATLAB's language. *isprime_fast* requires no arbitrary-precision arithmetic, C/C++ source code, or external libraries—it is entirely implemented in MATLAB. The results are typically 5 to 10 times faster for small integers and hundreds (or thousands) of times faster for large integers and long arrays.
 
 ## Syntax
 The syntax for *isprime_fast* is identical to *isprime*. It accepts an input array then returns which elements are prime. The only difference lies in the techniques used to determine primality.
