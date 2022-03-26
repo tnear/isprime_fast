@@ -117,9 +117,11 @@ Elapsed time is 2.689549 seconds.
 
 ##### Software & Hardware
 All results were obtained using MATLAB R2020b on Windows 10, Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz 2.59 GHz, 16 GB RAM. Results were also verified on:<br/>
+<pre>
 Windows 10, Intel(R) Xeon(R) W-2133 CPU @ 3.60GHz, 64 GB RAM<br/>
 Debian GNU/Linux 10 (buster), Intel(R) Xeon(R) Gold 6140 CPU @ 2.30GHz, 51 GiB RAM<br/>
 macOS Big Sur, Quad-Core Intel Core i3 @ 3.60Ghz, 32 GB RAM
+</pre>
 
 ##### Reproducibility
 The results on both Windows hardware were mostly consistent within a few percentage points. Linux and Mac fluctuated more but *isprime_fast* continued to outperform *isprime* strongly for every performance test.
