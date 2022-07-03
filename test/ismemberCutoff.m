@@ -144,7 +144,8 @@ classdef ismemberCutoff < matlab.unittest.TestCase
             timeit(@() isprimeTemp(input))
             timeit(@() isprime_fast(input))
         end
-        
+
+        % create plot comparing performance
         function bestFit(~)
             close all;
             legendText = {["Measured Data", "Linear Fit"], "Location", "northwest", ...
