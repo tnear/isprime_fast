@@ -1,6 +1,6 @@
 # isprime_fast
 
-**_isprime_fast_** (https://arxiv.org/abs/2108.04791) improves the performance of MATLAB's documented [*isprime*](https://www.mathworks.com/help/matlab/ref/isprime.html) function. *isprime_fast* uses modular arithmetic techniques, the Miller—Rabin primality test, vectorized operations, and division-minimizing strategies which harness the power of MATLAB's language. *isprime_fast* requires no arbitrary-precision arithmetic, C/C++ source code, or external libraries—it is entirely implemented in MATLAB. The results are typically 5 to 10 times faster for small integers and hundreds (or thousands) of times faster for large integers and long arrays.
+**_isprime_fast_** (https://arxiv.org/abs/2108.04791) improves the performance of MATLAB's documented [*isprime*](https://www.mathworks.com/help/matlab/ref/isprime.html) primality test. *isprime_fast* uses modular arithmetic techniques, the Miller—Rabin primality test, vectorized operations, and division-minimizing strategies which harness the power of MATLAB's language. *isprime_fast* requires no arbitrary-precision arithmetic, C/C++ source code, or external libraries—it is entirely implemented in MATLAB. The results are typically 5 to 10 times faster for small integers and hundreds (or thousands) of times faster for large integers and long arrays.
 
 ## Syntax
 The syntax for *isprime_fast* is identical to *isprime*. It accepts an input array then returns which elements are prime. The only difference lies in the techniques used to determine primality:
@@ -49,7 +49,7 @@ Elapsed time is 0.018214 seconds.
 % 1868x speedup over isprime
 ```
 
-### Scalar performance comparison of various bit-sizes for *isprime_fast*, *isprime*, and Symbolic Math Toolbox's *sym/isprime*
+### Scalar performance comparison of *isprime_fast*, *isprime*, and Symbolic Math Toolbox's *sym/isprime*
 ```
 Random prime numbers (2.4x to 260x isprime_fast speedup over isprime):
 Bit-size  isprime_fast  isprime     Perf speedup  sym/isprime  Perf speedup
@@ -100,8 +100,9 @@ Bit-size  isprime_fast  isprime     Perf speedup  sym/isprime  Perf speedup
 64        0.01126       33.2620     2953x         0.002531     0.2247x
 ```
 
-### Normal distribution of 100,000 random odd numbers with mean 2<sup>32</sup>
+### Performance comparison of normal distribution array
 ```MATLAB
+% create a normal distribution of 100,000 odd numbers with mean of 2^32
 >> input = abs(floor(normrnd(2^32, 2^30, [1, 100000])));
 >> evenIdx = mod(input, 2) == 0;
 >> input(evenIdx) = input(evenIdx) + 1; % convert to odd numbers
@@ -115,13 +116,14 @@ Elapsed time is 2.689549 seconds.
 % 7.28x speedup over isprime
 ```
 
-##### Software & Hardware
-All results were obtained using MATLAB R2020b on Windows 10, Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz 2.59 GHz, 16 GB RAM. Results were also verified on:<br/>
-<pre>
-Windows 10, Intel(R) Xeon(R) W-2133 CPU @ 3.60GHz, 64 GB RAM<br/>
-Debian GNU/Linux 10 (buster), Intel(R) Xeon(R) Gold 6140 CPU @ 2.30GHz, 51 GiB RAM<br/>
-macOS Big Sur, Quad-Core Intel Core i3 @ 3.60Ghz, 32 GB RAM
-</pre>
+## Reproducibility
+All results were obtained using MATLAB R2020b on Windows 10, Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz 2.59 GHz, 16 GB RAM. Additionally, the results were verified on these machines:
+```
+Windows 10, Intel(R) Xeon(R) W-2133 CPU @ 3.60GHz, 64 GB RAM
 
-##### Reproducibility
-The results on both Windows hardware were mostly consistent within a few percentage points. Linux and Mac fluctuated more but *isprime_fast* continued to outperform *isprime* strongly for every performance test.
+Debian GNU/Linux 10 (buster), Intel(R) Xeon(R) Gold 6140 CPU @ 2.30GHz, 51 GiB RAM
+
+macOS Big Sur, Quad-Core Intel Core i3 @ 3.60Ghz, 32 GB RAM
+```
+
+The benchmarks on Windows hardware were consistent within a few percentage points. Linux and Mac fluctuated more, but *isprime_fast* continued to outperform *isprime* strongly for every performance test.
