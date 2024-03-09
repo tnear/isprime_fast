@@ -5,7 +5,7 @@
 ## Syntax
 The syntax for *isprime_fast* is identical to *isprime*. It accepts an input array then returns which elements are prime. The only difference lies in the techniques used to determine primality:
 ```
->> isprime_fast([1, 2, 3, 4, 5])
+>> isprime_fast([1, 2, 3, 4, 5])  % 2, 3, and 5 are prime
 ans =
 
   1×5 logical array
@@ -15,7 +15,7 @@ ans =
 
 ## Performance comparison between *isprime* and *isprime_fast*
 ### Incrementing sequence
-```MATLAB
+```
 >> N = 1:100000000; % 1 to 100 million
 >> tic, isprime(N); toc
 Elapsed time is 32898.133274 seconds.
@@ -28,7 +28,7 @@ Elapsed time is 6.728862 seconds.
 
 ### 64-bit integers
 
-```MATLAB
+```
 >> N = uint64(18446744073709551557); % The largest 64-bit prime
 >> tic, isprime(N); toc
 Elapsed time is 31.11671 seconds.
@@ -101,7 +101,7 @@ Bit-size  isprime_fast  isprime     Perf speedup  sym/isprime  Perf speedup
 ```
 
 ### Performance comparison of normal distribution array
-```MATLAB
+```
 % create a normal distribution of 100,000 odd numbers with mean of 2^32
 >> input = abs(floor(normrnd(2^32, 2^30, [1, 100000])));
 >> evenIdx = mod(input, 2) == 0;
